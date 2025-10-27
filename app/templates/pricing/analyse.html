@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Analyse - Pricing{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analysis-section {
+        margin-top: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Analyse Comparative</h1>
+<p class="text-muted">Comparaisons relatives entre émetteurs et séniorités</p>
+
+{% if error %}
+<div class="alert alert-danger">
+    {{ error }}
+</div>
+{% else %}
+
+<!-- Section 1: Comparatif Global -->
+<div class="analysis-section">
+    <h3>Comparatif Global - Pricing vs Marché à 5 ans</h3>
+    <p class="text-muted">Écarts entre courbes de pricing et points de marché pour tous les émetteurs</p>
+
+    <div class="alert alert-info">
+        <strong>ℹ️ Fonctionnalité en développement</strong><br>
+        Cette page affichera :
+        <ul class="mb-0">
+            <li>Tableau comparatif tous émetteurs à 5 ans</li>
+            <li>Graphiques des écarts par séniorité</li>
+            <li>Top des opportunités RICH (à acheter) et CHEAP (surévalués)</li>
+            <li>Statistiques résumées par séniorité</li>
+        </ul>
+    </div>
+
+    <!-- Placeholder pour le tableau comparatif -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Tableau Comparatif</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">
+                Le tableau comparatif affichera pour chaque émetteur :
+            </p>
+            <ul>
+                <li>Prix de marché observé à 5 ans</li>
+                <li>Prix théorique du modèle (pricing)</li>
+                <li>Écart (Marché - Pricing)</li>
+                <li>Classification RICH/FAIR/CHEAP</li>
+            </ul>
+            <p class="text-muted small">
+                <em>Cette fonctionnalité nécessite un calcul intensif et sera ajoutée dans une prochaine version.</em>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Section 2: Analyse Cross-Séniorité -->
+<div class="analysis-section">
+    <h3>Analyse Cross-Séniorité</h3>
+    <p class="text-muted">Comparaisons relatives entre séniorités</p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Écarts entre Séniorités</h5>
+                </div>
+                <div class="card-body">
+                    <p>Compare les écarts de spread entre les différentes séniorités (vs Senior Preferred).</p>
+                    <ul class="small">
+                        <li>SLA vs SP</li>
+                        <li>T2 vs SP</li>
+                        <li>AT1 vs SP</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Position Relative vs Peers</h5>
+                </div>
+                <div class="card-body">
+                    <p>Position percentile de chaque émetteur vs ses pairs par séniorité.</p>
+                    <ul class="small">
+                        <li>Percentile de spread</li>
+                        <li>Comparaison avec la médiane du marché</li>
+                        <li>Identification des outliers</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section 3: Filtres et Options -->
+<div class="analysis-section">
+    <div class="card">
+        <div class="card-header">
+            <h5>Filtres et Options</h5>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label class="form-label">Émetteurs à comparer</label>
+                        <select class="form-select" multiple size="5">
+                            {% for issuer in available_issuers[:10] %}
+                            <option value="{{ issuer }}">{{ issuer }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Maintenez Ctrl pour sélection multiple</small>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Séniorités</label>
+                        <div class="form-check">
+                            {% for sen in available_seniorities %}
+                            <div>
+                                <input class="form-check-input" type="checkbox" id="sen_{{ sen }}" checked>
+                                <label class="form-check-label" for="sen_{{ sen }}">
+                                    {{ sen }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Risk Mid de référence</label>
+                        <select class="form-select">
+                            <option value="3">3 ans</option>
+                            <option value="5" selected>5 ans</option>
+                            <option value="7">7 ans</option>
+                            <option value="10">10 ans</option>
+                        </select>
+                        <button type="button" class="btn btn-primary mt-3 w-100">Calculer</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-warning mt-4">
+    <strong>⚠️ Note:</strong> Cette page est en cours de développement.
+    Les calculs intensifs pour tous les émetteurs seront ajoutés dans une prochaine version.
+    Pour l'instant, utilisez la page "Construction des Courbes" pour analyser un émetteur spécifique.
+</div>
+
+{% endif %}
+{% endblock %}

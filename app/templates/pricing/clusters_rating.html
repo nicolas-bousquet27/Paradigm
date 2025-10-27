@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Clusters Rating - Pricing{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cluster-viz {
+        min-height: 600px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Visualisation des Clusters de Rating</h1>
+<p class="text-muted">Analyse des groupes d'émetteurs selon leur rating (clustering sur Note uniquement)</p>
+
+{% if error %}
+<div class="alert alert-danger">
+    {{ error }}
+</div>
+{% else %}
+
+<!-- Contrôles -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Paramètres de Clustering</h5>
+    </div>
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('pricing.clusters_rating') }}">
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="n_clusters" class="form-label">Nombre de clusters</label>
+                    <input type="number" class="form-control" id="n_clusters"
+                           name="n_clusters" value="{{ n_clusters }}"
+                           min="2" max="15">
+                    <small class="text-muted">Nombre de groupes d'émetteurs à visualiser</small>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="seniority" class="form-label">Séniorité pour la visualisation</label>
+                    <select class="form-select" id="seniority" name="seniority">
+                        {% for sen in available_seniorities %}
+                        <option value="{{ sen }}" {% if sen == selected_seniority %}selected{% endif %}>
+                            {{ sen }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-muted">Filtrer par séniorité ou afficher tous</small>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Recalculer</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Visualisation -->
+<div class="card">
+    <div class="card-header">
+        <h5>Clusters de Rating - {{ n_clusters }} groupes ({{ selected_seniority }})</h5>
+    </div>
+    <div class="card-body">
+        <div class="cluster-viz">
+            <div class="alert alert-info">
+                <strong>📊 Graphique de Clustering Rating</strong><br>
+                <p>Ce graphique affichera :</p>
+                <ul>
+                    <li>Les émetteurs positionnés selon leur Note (rating) et LinReg (évolution)</li>
+                    <li>Les clusters identifiés par le clustering Ward</li>
+                    <li>Les enveloppes convexes autour de chaque cluster</li>
+                    <li>Les noms des émetteurs sur les points</li>
+                </ul>
+                <p class="mb-0 small">
+                    <em>Méthode : Clustering hiérarchique (Ward) sur la colonne 'Note' uniquement.</em>
+                </p>
+            </div>
+
+            <div id="plotly-clusters-rating"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistiques -->
+<div class="row mt-4">
+    <div class="col-12">
+        <h4>Statistiques par Cluster</h4>
+    </div>
+
+    {% for i in range(min(n_clusters, 5)) %}
+    <div class="col-md-{{ 12 // min(n_clusters, 5) }} mb-3">
+        <div class="card">
+            <div class="card-header">
+                <strong>Cluster {{ i + 1 }}</strong>
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>Émetteurs:</strong> <span class="badge bg-primary">N/A</span></p>
+                <p class="mb-1"><strong>Note moyenne:</strong> N/A</p>
+                <p class="mb-0"><strong>LinReg moyenne:</strong> N/A</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Tableau détaillé -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5>Détail des Clusters</h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">
+            Le tableau détaillera pour chaque émetteur :
+        </p>
+        <ul>
+            <li>Nom de l'émetteur</li>
+            <li>Note (rating numérique)</li>
+            <li>LinReg (évolution du rating)</li>
+            <li>Numéro du cluster attribué</li>
+        </ul>
+        <p class="small text-muted">
+            <em>Les clusters sont calculés uniquement sur la Note, mais visualisés selon Note x LinReg.</em>
+        </p>
+    </div>
+</div>
+
+<div class="alert alert-warning mt-4">
+    <strong>⚠️ Note:</strong> La visualisation complète avec graphiques Plotly et enveloppes convexes sera ajoutée dans une prochaine version.
+    Le backend de clustering est déjà implémenté et fonctionnel.
+</div>
+
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<!-- Plotly -->
+<script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+
+<script>
+// TODO: Implémenter la visualisation Plotly avec les données de clustering
+// Les calculs sont faits dans le backend, il faut juste les afficher ici
+
+console.log("Clusters Rating - Visualisation à implémenter");
+console.log("Paramètres: n_clusters={{ n_clusters }}, seniority={{ selected_seniority }}");
+</script>
+{% endblock %}

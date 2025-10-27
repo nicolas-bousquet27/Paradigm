@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Pricing - Accueil{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Application de Pricing</h1>
+        <p class="lead">Bienvenue dans l'application de pricing de fonds d'investissement.</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Card 1: Construction des Courbes -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">📊 Construction des Courbes</h5>
+                <p class="card-text">
+                    Construisez des courbes de pricing avec clustering rating et par tranches.
+                    Visualisez les courbes bleue (pricing) et rouge (marché).
+                </p>
+                <ul class="list-unstyled">
+                    <li>✓ Clustering rating (courbe jaune)</li>
+                    <li>✓ Clustering tranches (courbe verte)</li>
+                    <li>✓ Courbe bleue ajustée</li>
+                    <li>✓ Courbe rouge marché</li>
+                </ul>
+                <a href="{{ url_for('pricing.construction') }}" class="btn btn-primary">Accéder</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 2: Analyse -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">📈 Analyse</h5>
+                <p class="card-text">
+                    Analyse comparative globale et cross-séniorité.
+                    Comparaison pricing vs marché pour tous les émetteurs.
+                </p>
+                <ul class="list-unstyled">
+                    <li>✓ Comparatif global à 5 ans</li>
+                    <li>✓ Écarts pricing vs marché</li>
+                    <li>✓ Analyse cross-séniorité</li>
+                    <li>✓ Opportunités RICH/CHEAP</li>
+                </ul>
+                <a href="{{ url_for('pricing.analyse') }}" class="btn btn-primary">Accéder</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3: Clusters Rating -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">🎯 Clusters Rating</h5>
+                <p class="card-text">
+                    Visualisation des groupes d'émetteurs selon leur rating.
+                    Clustering hiérarchique (Ward) sur la Note.
+                </p>
+                <ul class="list-unstyled">
+                    <li>✓ Clustering Ward sur ratings</li>
+                    <li>✓ Enveloppes convexes</li>
+                    <li>✓ Statistiques par cluster</li>
+                    <li>✓ Tableau détaillé</li>
+                </ul>
+                <a href="{{ url_for('pricing.clusters_rating') }}" class="btn btn-primary">Accéder</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 4: Clusters Tranches -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">🔍 Clusters Tranches</h5>
+                <p class="card-text">
+                    Clustering K-means sur Z-Spread par tranches de Risk Mid.
+                    Visualisation des groupes par niveau de spread.
+                </p>
+                <ul class="list-unstyled">
+                    <li>✓ Tranches de Risk Mid</li>
+                    <li>✓ K-means sur Z-Spread</li>
+                    <li>✓ Contours par cluster</li>
+                    <li>✓ Statistiques par tranche</li>
+                </ul>
+                <a href="{{ url_for('pricing.clusters_tranches') }}" class="btn btn-primary">Accéder</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <h5>ℹ️ À propos</h5>
+            <p class="mb-0">
+                Cette application utilise des modèles de clustering et Nelson-Siegel pour construire des courbes de pricing.
+                Les données proviennent de Google Sheets et sont mises à jour en temps réel.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
