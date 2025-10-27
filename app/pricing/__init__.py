@@ -1,40 +1,39 @@
 """
-Module pour le modèle de pricing
-
-TODO: Placez ici votre code de modèle de pricing existant (celui de Streamlit)
-Créez une fonction principale que vous pourrez appeler depuis les routes
-
-Exemple:
-def run_pricing_model(parameters):
-    # Votre logique de calcul ici
-    # Utilisez les paramètres fournis
-
-    results = {
-        'estimated_return': 0.0,
-        'risk_score': 0.0,
-        'recommendation': ''
-    }
-
-    return results
+Module de pricing - Modèles de courbes et clustering
+Migré depuis l'application Streamlit
 """
 
-def run_pricing_model(parameters):
-    """
-    Fonction principale pour exécuter le modèle de pricing
+from .curves import (
+    nelson_siegel,
+    fit_nelson_siegel,
+    create_nelson_siegel_curve,
+    remove_outliers_iqr,
+    adjust_curve_to_market_points,
+    calculate_adjustment_score
+)
 
-    Args:
-        parameters (dict): Dictionnaire contenant les paramètres du modèle
+from .clustering import (
+    create_yellow_curve_rating_clustering,
+    create_green_curve_tranche_clustering,
+    create_blue_curve_fusion
+)
 
-    Returns:
-        dict: Résultats du calcul
-    """
-    # TODO: Intégrer votre modèle ici
+from .google_sheets import GoogleSheetsLoader
 
-    # Exemple de retour factice
-    results = {
-        'estimated_return': 0.0,
-        'risk_score': 0.0,
-        'recommendation': 'À implémenter'
-    }
+__all__ = [
+    # Curves
+    'nelson_siegel',
+    'fit_nelson_siegel',
+    'create_nelson_siegel_curve',
+    'remove_outliers_iqr',
+    'adjust_curve_to_market_points',
+    'calculate_adjustment_score',
 
-    return results
+    # Clustering
+    'create_yellow_curve_rating_clustering',
+    'create_green_curve_tranche_clustering',
+    'create_blue_curve_fusion',
+
+    # Google Sheets
+    'GoogleSheetsLoader'
+]
