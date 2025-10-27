@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Nouveau Calcul - Pricing Investment Fund{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <h1 class="mb-4">Nouveau Calcul de Pricing</h1>
+
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('pricing.new') }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom du calcul</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                        <div class="form-text">Donnez un nom descriptif à votre calcul</div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h4 class="mb-3">Paramètres du modèle</h4>
+
+                    <div class="mb-3">
+                        <label for="investment_amount" class="form-label">Montant de l'investissement</label>
+                        <input type="number" class="form-control" id="investment_amount" name="investment_amount" step="0.01" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="duration" class="form-label">Durée (en années)</label>
+                        <input type="number" class="form-control" id="duration" name="duration" min="1" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="risk_level" class="form-label">Niveau de risque</label>
+                        <select class="form-select" id="risk_level" name="risk_level" required>
+                            <option value="">Sélectionnez...</option>
+                            <option value="low">Faible</option>
+                            <option value="medium">Moyen</option>
+                            <option value="high">Élevé</option>
+                        </select>
+                    </div>
+
+                    <!-- TODO: Ajoutez ici les autres paramètres de votre modèle -->
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Créer le calcul</button>
+                        <a href="{{ url_for('pricing.list') }}" class="btn btn-secondary">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
