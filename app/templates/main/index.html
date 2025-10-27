@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil - Pricing Investment Fund{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Bienvenue sur votre espace Pricing</h1>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h3 class="card-title">Nouveau Calcul</h3>
+                        <p class="card-text">Créez un nouveau calcul de pricing pour votre fonds d'investissement.</p>
+                        <a href="{{ url_for('pricing.new') }}" class="btn btn-primary">Commencer</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h3 class="card-title">Mes Calculs</h3>
+                        <p class="card-text">Consultez et gérez tous vos calculs de pricing existants.</p>
+                        <a href="{{ url_for('pricing.list') }}" class="btn btn-secondary">Voir mes calculs</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h3 class="card-title">Tableau de bord</h3>
+                        <p class="card-text">Visualisez vos statistiques et analyses.</p>
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-info">Voir le dashboard</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

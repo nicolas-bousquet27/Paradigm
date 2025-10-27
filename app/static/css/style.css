@@ -1,0 +1,46 @@
+/* Style personnalisé pour l'application */
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+footer {
+    margin-top: auto;
+}
+
+/* Amélioration des alertes */
+.alert {
+    border-radius: 8px;
+}
+
+/* Style des formulaires */
+.form-label {
+    font-weight: 600;
+}
+
+/* Tables responsives */
+@media (max-width: 768px) {
+    .table {
+        font-size: 0.9rem;
+    }
+}

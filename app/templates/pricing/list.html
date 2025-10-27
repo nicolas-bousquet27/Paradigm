@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Mes Calculs - Pricing Investment Fund{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Mes Calculs de Pricing</h1>
+            <a href="{{ url_for('pricing.new') }}" class="btn btn-primary">Nouveau Calcul</a>
+        </div>
+
+        {% if pricing_data %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Date de création</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pricing in pricing_data %}
+                    <tr>
+                        <td>{{ pricing.name }}</td>
+                        <td>{{ pricing.created_at[:10] }}</td>
+                        <td>
+                            {% if pricing.results %}
+                                <span class="badge bg-success">Calculé</span>
+                            {% else %}
+                                <span class="badge bg-warning">En attente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if pricing.results %}
+                                <a href="{{ url_for('pricing.view', pricing_id=pricing.id) }}" class="btn btn-sm btn-info">Voir</a>
+                            {% else %}
+                                <a href="{{ url_for('pricing.calculate', pricing_id=pricing.id) }}" class="btn btn-sm btn-primary">Calculer</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <p class="mb-0">Vous n'avez pas encore de calculs. <a href="{{ url_for('pricing.new') }}">Créez votre premier calcul</a></p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
