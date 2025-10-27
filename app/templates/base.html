@@ -27,11 +27,16 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('main.index') }}">Accueil</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('pricing.list') }}">Mes Calculs</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('pricing.new') }}">Nouveau Calcul</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="pricingDropdown" role="button" data-bs-toggle="dropdown">
+                            Pricing
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('pricing.construction') }}">Construction des Courbes</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('pricing.analyse') }}">Analyse</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('pricing.clusters_rating') }}">Clusters Rating</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('pricing.clusters_tranches') }}">Clusters Tranches</a></li>
+                        </ul>
                     </li>
                 </ul>
                 <ul class="navbar-nav">

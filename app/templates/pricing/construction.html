@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+
+{% block title %}Construction des Courbes{% endblock %}
+
+{% block extra_css %}
+<style>
+    .control-panel {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .score-slider {
+        margin-bottom: 15px;
+    }
+    #plotly-chart {
+        width: 100%;
+        height: 600px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Construction des Courbes de Pricing</h1>
+<p class="text-muted">Courbe Bleue (fusion des méthodes) + Courbe Rouge (marché ajustée)</p>
+
+{% if error %}
+<div class="alert alert-danger">
+    {{ error }}
+</div>
+{% else %}
+
+<!-- Panneau de contrôle -->
+<div class="control-panel">
+    <form method="GET" action="{{ url_for('pricing.construction') }}" id="controlForm">
+        <div class="row">
+            <!-- Sélection émetteur et séniorité -->
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="issuer" class="form-label"><strong>Émetteur</strong></label>
+                    <select class="form-select" id="issuer" name="issuer" onchange="this.form.submit()">
+                        {% for issuer in available_issuers %}
+                        <option value="{{ issuer }}" {% if issuer == selected_issuer %}selected{% endif %}>
+                            {{ issuer }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="seniority" class="form-label"><strong>Séniorité</strong></label>
+                    <select class="form-select" id="seniority" name="seniority" onchange="this.form.submit()">
+                        {% for seniority in available_seniorities %}
+                        <option value="{{ seniority }}" {% if seniority == selected_seniority %}selected{% endif %}>
+                            {{ seniority }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scores d'ajustement -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <h5>Scores d'Ajustement</h5>
+                <p class="text-muted small">Ajustement vertical de la courbe bleue (pricing)</p>
+            </div>
+
+            <div class="col-md-4">
+                <div class="score-slider">
+                    <label for="score_liquidite" class="form-label">
+                        Score de liquidité: <span id="liquidite_value">{{ score_liquidite }}</span>
+                    </label>
+                    <input type="range" class="form-range" min="1" max="5" step="1"
+                           id="score_liquidite" name="score_liquidite" value="{{ score_liquidite }}"
+                           oninput="document.getElementById('liquidite_value').textContent = this.value">
+                    <small class="text-muted">1 = Très liquide (-20%), 5 = Très illiquide (+20%)</small>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="score-slider">
+                    <label for="score_equity" class="form-label">
+                        Score Equity: <span id="equity_value">{{ score_equity }}</span>
+                    </label>
+                    <input type="range" class="form-range" min="1" max="5" step="1"
+                           id="score_equity" name="score_equity" value="{{ score_equity }}"
+                           oninput="document.getElementById('equity_value').textContent = this.value">
+                    <small class="text-muted">1 = Equity forte (-20%), 5 = Equity faible (+20%)</small>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="score-slider">
+                    <label for="score_solidite" class="form-label">
+                        Solidité historique: <span id="solidite_value">{{ score_solidite }}</span>
+                    </label>
+                    <input type="range" class="form-range" min="1" max="5" step="1"
+                           id="score_solidite" name="score_solidite" value="{{ score_solidite }}"
+                           oninput="document.getElementById('solidite_value').textContent = this.value">
+                    <small class="text-muted">1 = Très solide (-20%), 5 = Peu solide (+20%)</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Résumé ajustements -->
+        {% if curves_data %}
+        <div class="row mt-2">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <strong>Ajustement Total: {{ "%.1f"|format(curves_data.adjustment_pct) }}%</strong>
+                    {% if curves_data.adjustment_pct > 0 %}
+                    - Courbe décalée vers le HAUT
+                    {% elif curves_data.adjustment_pct < 0 %}
+                    - Courbe décalée vers le BAS
+                    {% else %}
+                    - Aucun ajustement appliqué
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Paramètres de clustering -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <h5>Paramètres des Courbes</h5>
+            </div>
+
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="n_clusters_rating" class="form-label">
+                        Clusters Rating (Courbe Jaune)
+                    </label>
+                    <input type="number" class="form-control" id="n_clusters_rating"
+                           name="n_clusters_rating" value="{{ n_clusters_rating }}"
+                           min="2" max="10">
+                    <small class="text-muted">Nombre de groupes selon rating</small>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label for="n_clusters_spread" class="form-label">
+                        Clusters Z-Spread (Courbe Verte)
+                    </label>
+                    <input type="number" class="form-control" id="n_clusters_spread"
+                           name="n_clusters_spread" value="{{ n_clusters_spread }}"
+                           min="2" max="10">
+                    <small class="text-muted">Nombre de niveaux de spread</small>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label class="form-label">Options d'affichage</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="show_individual_curves"
+                               name="show_individual_curves" value="true"
+                               {% if show_individual_curves %}checked{% endif %}>
+                        <label class="form-check-label" for="show_individual_curves">
+                            Afficher courbes jaune/vert
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Recalculer</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Graphique Plotly -->
+{% if curves_data %}
+<div class="card mt-4">
+    <div class="card-header">
+        <h4>Courbes de Pricing - {{ selected_issuer }} {{ selected_seniority }}</h4>
+    </div>
+    <div class="card-body">
+        <div id="plotly-chart"></div>
+    </div>
+</div>
+
+<!-- Informations sur les courbes -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Informations Courbe Jaune (Rating)</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ curves_data.info.yellow }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Informations Courbe Verte (Tranches)</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ curves_data.info.green }}</p>
+                {% if curves_data.info.tranches %}
+                <ul class="list-unstyled small">
+                    {% for tranche in curves_data.info.tranches %}
+                    <li>• {{ tranche.name }}: {{ tranche.points }} points, cluster {{ tranche.cluster }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Informations Courbe Bleue (Pricing)</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ curves_data.info.blue }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Informations Courbe Rouge (Marché)</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ curves_data.info.red }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="alert alert-warning mt-4">
+    Pas assez de données pour calculer les courbes. Essayez un autre émetteur ou une autre séniorité.
+</div>
+{% endif %}
+
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<!-- Plotly -->
+<script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+
+{% if curves_data %}
+<script>
+// Données des courbes
+const riskGrid = {{ curves_data.risk_grid | tojson | safe }};
+const yellowCurve = {{ curves_data.yellow_curve | tojson | safe }};
+const greenCurve = {{ curves_data.green_curve | tojson | safe }};
+const blueCurve = {{ curves_data.blue_curve | tojson | safe }};
+const redCurve = {{ curves_data.red_curve | tojson | safe }};
+const issuerPoints = {{ curves_data.issuer_points.to_dict('records') | tojson | safe }};
+const showIndividualCurves = {{ 'true' if show_individual_curves else 'false' }};
+
+// Créer le graphique
+const traces = [];
+
+// Points de l'émetteur (diamants noirs)
+if (issuerPoints && issuerPoints.length > 0) {
+    traces.push({
+        x: issuerPoints.map(p => p.riskmid),
+        y: issuerPoints.map(p => p.zspread),
+        mode: 'markers',
+        name: '{{ selected_issuer }} Points Marché',
+        marker: {
+            color: 'black',
+            size: 12,
+            symbol: 'diamond',
+            line: { width: 2, color: 'white' }
+        },
+        hovertemplate: '<b>{{ selected_issuer }}</b><br>Risk Mid: %{x:.2f}<br>Z-Spread: %{y:.0f} bps<extra></extra>'
+    });
+}
+
+// Courbes individuelles (optionnel)
+if (showIndividualCurves) {
+    if (yellowCurve) {
+        traces.push({
+            x: riskGrid,
+            y: yellowCurve,
+            mode: 'lines',
+            name: 'Courbe Jaune (Rating)',
+            line: { color: 'gold', width: 2, dash: 'dot' },
+            opacity: 0.6
+        });
+    }
+
+    if (greenCurve) {
+        traces.push({
+            x: riskGrid,
+            y: greenCurve,
+            mode: 'lines',
+            name: 'Courbe Verte (Tranches)',
+            line: { color: 'green', width: 2, dash: 'dot' },
+            opacity: 0.6
+        });
+    }
+}
+
+// Courbe bleue (pricing ajusté)
+if (blueCurve) {
+    traces.push({
+        x: riskGrid,
+        y: blueCurve,
+        mode: 'lines',
+        name: 'Courbe Bleue (Pricing Ajusté)',
+        line: { color: '#0448B3', width: 4 }
+    });
+}
+
+// Courbe rouge (marché ajustée)
+if (redCurve) {
+    traces.push({
+        x: riskGrid,
+        y: redCurve,
+        mode: 'lines',
+        name: 'Courbe Rouge (Marché)',
+        line: { color: 'red', width: 4 }
+    });
+}
+
+// Layout
+const layout = {
+    title: 'Courbes de Pricing - {{ selected_issuer }} {{ selected_seniority }}',
+    xaxis: {
+        title: 'Risk Mid',
+        range: [0, 10]
+    },
+    yaxis: {
+        title: 'Z-Spread (bps)'
+    },
+    hovermode: 'closest',
+    showlegend: true,
+    legend: {
+        orientation: 'h',
+        yanchor: 'bottom',
+        y: 1.02,
+        xanchor: 'center',
+        x: 0.5
+    },
+    plot_bgcolor: 'white',
+    paper_bgcolor: 'white'
+};
+
+// Afficher le graphique
+Plotly.newPlot('plotly-chart', traces, layout, { responsive: true });
+</script>
+{% endif %}
+{% endblock %}
