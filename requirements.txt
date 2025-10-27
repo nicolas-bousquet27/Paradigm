@@ -18,13 +18,14 @@ email-validator==2.1.0
 python-dotenv==1.0.0
 
 # Libraires scientifiques (pour votre modèle de pricing)
-numpy==1.26.2
-pandas==2.1.4
-scipy==1.11.4
-scikit-learn==1.3.2
+# Utiliser --only-binary pour éviter la compilation
+numpy>=1.24.0,<2.0.0
+pandas>=2.0.0,<2.2.0
+scipy>=1.10.0,<1.12.0
+scikit-learn>=1.3.0,<1.4.0
 
 # Visualisation
-plotly==5.18.0
+plotly>=5.17.0
 
 # Utilitaires
 gunicorn==21.2.0
